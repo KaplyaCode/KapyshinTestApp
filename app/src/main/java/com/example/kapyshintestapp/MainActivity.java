@@ -16,6 +16,8 @@ import android.widget.Toast;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import com.appsflyer.AppsFlyerLib;
+
 public class MainActivity extends AppCompatActivity {
 
     private Button exitButton;
@@ -25,11 +27,14 @@ public class MainActivity extends AppCompatActivity {
     private Boolean access = false;
     private Timer timer;
     private TimerTask timerTask;
+    private AppsFlyerLib appsflyer = AppsFlyerLib.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        appsflyer.init(getString(R.string.appsFlyer_id), null, this);
+        appsflyer.start(this);
 
         timer = new Timer();
 
