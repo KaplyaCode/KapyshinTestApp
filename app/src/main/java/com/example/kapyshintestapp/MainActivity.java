@@ -3,24 +3,27 @@ package com.example.kapyshintestapp;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
 
-import android.app.Fragment;
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.View;
-import android.widget.Button;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.Toast;
 
 import java.util.Timer;
 import java.util.TimerTask;
 
 import com.appsflyer.AppsFlyerLib;
+import com.onesignal.OneSignal;
 
 public class MainActivity extends AppCompatActivity {
-
-    private Button exitButton;
 
     SharedPreferences sPref;
     final String ACCESS = "acesGranted";
@@ -28,17 +31,26 @@ public class MainActivity extends AppCompatActivity {
     private Timer timer;
     private TimerTask timerTask;
     private AppsFlyerLib appsflyer = AppsFlyerLib.getInstance();
+    private static String ONESIGNAL_APP_ID = "6ffbbe4f-9e83-41b6-a8d8-c1f678ac825d";
+
+    private WebViewFragment webFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         appsflyer.init(getString(R.string.appsFlyer_id), null, this);
         appsflyer.start(this);
+
+        OneSignal.setLogLevel(OneSignal.LOG_LEVEL.VERBOSE, OneSignal.LOG_LEVEL.NONE);
+        OneSignal.initWithContext(this);
+        OneSignal.setAppId(ONESIGNAL_APP_ID);
 
         timer = new Timer();
 
         FragmentSelector();
+
     }
 
     public void FragmentSelector(){
@@ -68,10 +80,12 @@ public class MainActivity extends AppCompatActivity {
                             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
                             fragmentTransaction.replace(R.id.container, fragment);
                             fragmentTransaction.commit();
-                        }else{
-                            WebViewFragment fragment = new WebViewFragment();
+                            webFragment = null;
+                        }else if (webFragment == null){
+                            webFragment = new WebViewFragment();
+
                             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-                            fragmentTransaction.replace(R.id.container, fragment);
+                            fragmentTransaction.replace(R.id.container, webFragment);
                             fragmentTransaction.commit();
                         }
                     }
