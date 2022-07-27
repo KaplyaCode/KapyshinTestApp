@@ -12,13 +12,10 @@ import android.widget.Toast;
 
 public class StartFragment extends Fragment {
 
-    private Button exitButton;
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        //exitButton = findViewById(R.id.exitButton);
     }
 
     @Override
