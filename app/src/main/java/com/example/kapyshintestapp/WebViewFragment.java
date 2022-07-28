@@ -9,16 +9,18 @@ import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebBackForwardList;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 import android.widget.Toast;
+
+import java.util.List;
 
 public class WebViewFragment extends Fragment {
 
@@ -28,13 +30,14 @@ public class WebViewFragment extends Fragment {
     final String URL = "currentUrl";
     private WebViewFragment webViewFragment = this;
 
+    //private List<WebSite> webSiteList;
+    //private WebBackForwardList backForwardList;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         sPref = this.getActivity().getSharedPreferences("MyPref", Context.MODE_PRIVATE);
-
-
     }
 
     @Override
@@ -44,22 +47,29 @@ public class WebViewFragment extends Fragment {
             return null;
         }
 
-        FrameLayout ll = (FrameLayout) inflater.inflate(R.layout.fragment_web_view, container, false);
-        WebView webView = (WebView) ll.findViewById(R.id.web);
+        FrameLayout frameLayout = (FrameLayout) inflater.inflate(R.layout.fragment_web_view, container, false);
+        WebView webView = (WebView) frameLayout.findViewById(R.id.web);
         WebViewController(webView);
 
-        return ll;
+        return frameLayout;
     }
 
     private void WebViewController(WebView web) {
         webView = web;
         webView.getSettings().setJavaScriptEnabled(true);
+        /*for (int i = 0; i < 50; i++){
+            String test = sPref.getString(i + "", "https://javarush.ru/groups/posts/for-each-java");
+            if(test == "https://javarush.ru/groups/posts/for-each-java"){
+                break;
+            }
+            webView.loadUrl(sPref.getString(i + "", "https://www.google.com"));
+        }*/
         try {
             webView.loadUrl(sPref.getString(URL, "https://www.google.com"));
-        }  catch (Exception e){
+        }catch (Exception e){
             webView.loadUrl("https://www.google.com");
         }
-        webView.canGoBack();
+
         WebViewClient webViewClient = new WebViewClient() {
             @SuppressWarnings("deprecation")
             @Override
@@ -89,11 +99,24 @@ public class WebViewFragment extends Fragment {
                 return false;
             }
         });
+
     }
 
     @Override
     public void onStop() {
         SharedPreferences.Editor ed = sPref.edit();
+        /*
+        backForwardList = webView.copyBackForwardList();
+
+        for (int i = 0; i <= backForwardList.getCurrentIndex(); i++) {
+            ed.putString(i + "", backForwardList.getItemAtIndex(i).getUrl());
+            webSiteList.add(new WebSite(webSiteList.size()+ "", backForwardList.getItemAtIndex(i).getUrl()));
+        }
+
+        for (WebSite item : webSiteList) {
+            ed.putString(item.getName(), item.getUrl());
+        }
+        */
         ed.putString(URL, webView.getUrl());
         ed.commit();
         super.onStop();
